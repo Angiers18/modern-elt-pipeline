@@ -1,0 +1,8 @@
+services:
+  elt-environment:
+    image: python:3.11-slim
+    container_name: modern_elt_env
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: tail -f /dev/null
