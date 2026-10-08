@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: raw_data
+    schema: main
+    description: "Datos crudos extraídos de la API de Pokémon"
+    tables:
+      - name: raw_pokemons
+        description: "Tabla con los 150 pokemons iniciales"
