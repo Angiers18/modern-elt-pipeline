@@ -1,0 +1,81 @@
+version: 2
+
+sources:
+  - name: raw_data
+    schema: main
+    description: "Datos crudos extraídos de la API de Pokémon (cargados por extract.py)"
+    tables:
+      - name: raw_pokemons
+        description: "Tabla con los 150 pokemons iniciales"
+        columns:
+          - name: id
+            description: "Identificador del Pokémon en la PokéAPI"
+            tests:
+              - unique
+              - not_null
+          - name: name
+            description: "Nombre del Pokémon tal como lo entrega la API"
+            tests:
+              - not_null
+          - name: height
+            description: "Altura en decímetros"
+          - name: weight
+            description: "Peso en hectogramos"
+          - name: base_experience
+            description: "Experiencia base otorgada al derrotarlo"
+          - name: primary_type
+            description: "Primer tipo del Pokémon según la API"
+            tests:
+              - not_null
+
+models:
+  - name: stg_pokemons
+    description: "Modelo staging limpio de los Pokémon: nombres en minúsculas, unidades convertidas a metros y kilos y tipo capitalizado"
+    columns:
+      - name: pokemon_id
+        description: "Identificador único del Pokémon"
+        tests:
+          - unique
+          - not_null
+      - name: pokemon_name
+        description: "Nombre del Pokémon en minúsculas"
+        tests:
+          - not_null
+      - name: height_m
+        description: "Altura en metros"
+        tests:
+          - not_null
+      - name: weight_kg
+        description: "Peso en kilogramos"
+        tests:
+          - not_null
+      - name: base_experience
+        description: "Experiencia base otorgada al derrotarlo"
+      - name: primary_type
+        description: "Tipo principal del Pokémon, capitalizado (ej. Fire, Grass)"
+        tests:
+          - not_null
+
+  - name: stg_pokemon_stats
+    description: "Estadísticas de experiencia por Pokémon con una categoría calculada (Low, Medium o High XP)"
+    columns:
+      - name: pokemon_id
+        description: "Identificador único del Pokémon"
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_pokemons')
+              field: pokemon_id
+      - name: pokemon_name
+        description: "Nombre del Pokémon en minúsculas"
+        tests:
+          - not_null
+      - name: base_experience
+        description: "Experiencia base otorgada al derrotarlo"
+      - name: xp_category
+        description: "Categoría de experiencia: Low XP (< 60), Medium XP (60 a 150) o High XP (> 150)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Low XP', 'Medium XP', 'High XP']

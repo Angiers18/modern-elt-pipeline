@@ -1,0 +1,6 @@
+transform_dbt:
+  outputs:
+    dev:
+      type: duckdb
+      path: /workspace/data/raw_data.duckdb
+  target: dev

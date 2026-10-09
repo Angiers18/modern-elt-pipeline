@@ -1,0 +1,73 @@
+version: 2
+
+models:
+  - name: dim_pokemon_summary
+    description: "Resumen agregado por tipo principal de Pokémon (una fila por tipo)"
+    columns:
+      - name: primary_type
+        description: "Tipo principal del Pokémon"
+        tests:
+          - unique
+          - not_null
+      - name: total_pokemons
+        description: "Cantidad de Pokémon del tipo"
+        tests:
+          - not_null
+      - name: avg_height_m
+        description: "Altura promedio en metros"
+      - name: avg_weight_kg
+        description: "Peso promedio en kilogramos"
+        tests:
+          - not_null
+      - name: avg_base_experience
+        description: "Experiencia base promedio"
+      - name: max_weight_kg
+        description: "Peso máximo del tipo en kilogramos"
+      - name: min_weight_kg
+        description: "Peso mínimo del tipo en kilogramos"
+      - name: weight_rank_by_type
+        description: "Ranking de los tipos por peso promedio (1 = el más pesado)"
+
+  - name: fct_pokemon_details
+    description: "Detalle por Pokémon enriquecido con su categoría de experiencia y métricas de su tipo (una fila por Pokémon)"
+    columns:
+      - name: pokemon_id
+        description: "Identificador único del Pokémon"
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_pokemons')
+              field: pokemon_id
+      - name: pokemon_name
+        description: "Nombre del Pokémon en minúsculas"
+        tests:
+          - not_null
+      - name: primary_type
+        description: "Tipo principal del Pokémon"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_pokemon_summary')
+              field: primary_type
+      - name: height_m
+        description: "Altura en metros"
+      - name: weight_kg
+        description: "Peso en kilogramos"
+      - name: base_experience
+        description: "Experiencia base otorgada al derrotarlo"
+      - name: xp_category
+        description: "Categoría de experiencia: Low XP, Medium XP o High XP"
+        tests:
+          - accepted_values:
+              values: ['Low XP', 'Medium XP', 'High XP']
+      - name: pokemons_in_same_type
+        description: "Cantidad de Pokémon que comparten el tipo principal"
+      - name: avg_type_weight_kg
+        description: "Peso promedio del tipo en kilogramos"
+      - name: weight_comparison_to_type
+        description: "Indica si el peso del Pokémon está por encima del promedio de su tipo"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Above Type Average', 'Below or Equal to Type Average']
